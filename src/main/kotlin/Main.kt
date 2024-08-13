@@ -1,22 +1,22 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+
 
 @Composable
 fun App() {
     MaterialTheme {
-        butonLlamado()
+        buttonCall()
     }
-
 }
 
 fun main() = application {
@@ -24,18 +24,14 @@ fun main() = application {
         App()
     }
 }
+
 @Composable
-fun butonLlamado(){
-    var text by remember { mutableStateOf("Hello, World!") }
+fun buttonCall(){
     Row{
         Button(onClick = {
         }) {
-            Text(text)
-        }
-        Button(onClick = {
-        }) {
-            Text(text+"sadasdasd")
+            Text("Acabar turno")
         }
     }
-
+Spacer(modifier = Modifier.fillMaxSize().drawBehind { drawCircle(Color.Red) })
 }
