@@ -45,8 +45,8 @@ fun gridCall() {
                     items(1) {
                         Box(
                             modifier = Modifier
-                                .padding(0.5.dp) // Reduce padding to make items smaller
-                                .aspectRatio(0.8f) // Adjust aspect ratio to make the items smaller
+                                .padding(1.dp) // Reduce padding to make items smaller
+                                .aspectRatio(1f) // Adjust aspect ratio to make the items smaller
                                 .clip(RoundedCornerShape(5.dp))
                                 .background(
                                     when {
@@ -79,7 +79,7 @@ fun gridCall() {
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        state = rememberWindowState(size = DpSize(900.dp, 925.dp))  // Specify  the inicial size of the window
+//        state = rememberWindowState(size = DpSize(900.dp, 925.dp))  // Specify  the inicial size of the window
     ) {
         App()
     }
