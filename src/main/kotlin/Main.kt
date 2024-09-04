@@ -7,8 +7,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.minimumInteractiveComponentSize
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +42,7 @@ fun gridCall() {
             for (x in 0..10) {
                 for (y in 0..10) {
                     items(1) {
+                        var colorVar by remember { mutableStateOf(Color.Gray) }
                         Box(
                             modifier = Modifier
                                 .padding(1.dp) // Reduce padding to make items smaller
@@ -51,18 +51,15 @@ fun gridCall() {
                                 .background(
                                     when {
                                         x == 0 && y == 0 -> Color.Black // Paint the box in the position (0, 0) black
-                                        else -> Color.Gray
+                                        else -> colorVar
                                     }
-                                )
-                                .then(
+                                ).clickable {
                                     if (x == 0 || y == 0) {
-                                        Modifier
-                                    } else {
-                                        Modifier.clickable {
-                                            println("Touched!!")
-                                        }
+                                        return@clickable
                                     }
-                                ),
+                                colorVar = Color.Blue
+                                println("Touched!!")
+                            },
                             contentAlignment = Alignment.Center,
                         ) {
                             if (x == 0) Text(text = "${listOfChars[y]}")
@@ -79,7 +76,7 @@ fun gridCall() {
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-//        state = rememberWindowState(size = DpSize(900.dp, 925.dp))  // Specify  the inicial size of the window
+        state = rememberWindowState(size = DpSize(900.dp, 925.dp))  // Specify  the inicial size of the window
     ) {
         App()
     }
