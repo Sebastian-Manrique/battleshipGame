@@ -66,43 +66,37 @@ fun gridCall(arr: Array<IntArray>, modifier: Modifier = Modifier) {
 //        , modifier = Modifier.defaultMinSize(800.dp,800.dp)
     )
     {
-        for (x in 0..10) {
-            for (y in 0..10) {
-                items(1) {
-                    var colorVar by remember { mutableStateOf(Color.LightGray) }
-                    Box(
-                        modifier = Modifier
-                            .defaultMinSize(10.dp, 10.dp)
-                            .padding(1.dp) // Reduce padding to make items smaller
-                            .aspectRatio(1f) // Adjust aspect ratio to make the items smaller
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(
-                                when {
-                                    x == 0 && y == 0 -> Color.Black // Paint the box in the position (0, 0) black
-                                    else -> colorVar
-                                }
-                            ).clickable {
-                                if (x == 0 || y == 0) {
-                                    return@clickable
-                                }
-                                colorVar = when (colorVar) {
-                                    Color.LightGray -> Color(0xFF60B9FF)
-                                    Color.Blue -> Color.LightGray
-                                    else -> Color.LightGray
-                                }
-                                println("Touched x is $x and y is $y !!")
-//                                colorVar = when {
-//                                    colorVar == Color.LightGray && arr[x - 1][y - 1] == 1 -> Color.Red
-//                                    colorVar == Color.LightGray && arr[x - 1][y - 1] == 0 -> Color.Yellow
-//                                    else -> Color.LightGray
-//                                }
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (x == 0) Text(text = "${listOfChars[y]}")
-                        else if (y == 0) Text(text = "$x")
-                    }
-                }
+        items(121) {
+            var colorVar by remember { mutableStateOf(Color.LightGray) }
+            val x = it % 11
+            val y = (it - 1) / 11
+
+            Box(
+                modifier = Modifier
+                    .defaultMinSize(10.dp, 10.dp)
+                    .padding(1.dp) // Reduce padding to make items smaller
+                    .aspectRatio(1f) // Adjust aspect ratio to make the items smaller
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(
+                        when {
+                            it == 0 -> Color.Black // Paint the box in the position (0, 0) black
+                            else -> colorVar
+                        }
+                    ).clickable {
+                        if (x == 0 || y == 0) {
+                            return@clickable
+                        }
+//                        println("Touched x is $x and y is $y !!")
+                        colorVar = when {
+                            colorVar == Color.LightGray && arr[x - 1][y - 1] == 1 -> Color.Red
+                            colorVar == Color.LightGray && arr[x - 1][y - 1] == 0 -> Color.Yellow
+                            else -> Color.LightGray
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (x == 0) Text(text = "${y + 1}")
+                else if (y == 0) Text(text = "${listOfChars[x]}")
             }
         }
     }
@@ -156,10 +150,9 @@ fun gridCallOpponent(modifier: Modifier = Modifier) {
 
 fun createArray(): Array<IntArray> {
     val arr = Array(10) { IntArray(10) }
-    for (x in arr) {
-        for (y in x) {
-            val cosa = (0..1).random()
-            println("La cosa es $cosa")
+    for (y in arr.indices) {
+        for (x in arr[y].indices) {
+            arr[y][x] = (0..1).random()
         }
     }
     return arr
