@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.toFontFamily
@@ -28,6 +29,7 @@ import androidx.compose.ui.window.rememberWindowState
 fun App() {
 
     val arr by remember { mutableStateOf(createArray()) }
+    val arrOpponent by remember { mutableStateOf(createArray()) }
 
     val comic = Font(
         resource = "fontC.ttf",
@@ -44,12 +46,12 @@ fun App() {
         ) {
             Row {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                    gridCall(arr)
+                    gridCall(arr, comic)
                     Text("Your field", color = Color.White, fontFamily = comic.toFontFamily(), fontSize = 40.sp)
                 }
                 Spacer(modifier = Modifier.size(100.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                    gridCallOpponent()
+                    gridCallOpponent(arrOpponent, comic)
                     Text("Enemy field", color = Color.White, fontFamily = comic.toFontFamily(), fontSize = 40.sp)
                 }
             }
@@ -58,7 +60,7 @@ fun App() {
 }
 
 @Composable
-fun gridCall(arr: Array<IntArray>, modifier: Modifier = Modifier) {
+fun gridCall(arr: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
     val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
     LazyVerticalGrid(
         modifier = modifier,
@@ -66,10 +68,15 @@ fun gridCall(arr: Array<IntArray>, modifier: Modifier = Modifier) {
 //        , modifier = Modifier.defaultMinSize(800.dp,800.dp)
     )
     {
-        items(121) {
-            var colorVar by remember { mutableStateOf(Color.LightGray) }
+        items(121) {    //Friendly grid
             val x = it % 11
             val y = (it - 1) / 11
+            var colorVar by remember {
+                mutableStateOf(
+                    if (x > 0 && y > 0 && arr[x - 1][y - 1] == 1) Color(0xFF006605) // If arr[x][y] == 1, paint green
+                    else Color.LightGray // Use the default color
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -82,28 +89,33 @@ fun gridCall(arr: Array<IntArray>, modifier: Modifier = Modifier) {
                             it == 0 -> Color.Black // Paint the box in the position (0, 0) black
                             else -> colorVar
                         }
-                    ).clickable {
+                    )
+                    .clickable {
                         if (x == 0 || y == 0) {
                             return@clickable
                         }
-//                        println("Touched x is $x and y is $y !!")
                         colorVar = when {
-                            colorVar == Color.LightGray && arr[x - 1][y - 1] == 1 -> Color.Red
-                            colorVar == Color.LightGray && arr[x - 1][y - 1] == 0 -> Color.Yellow
-                            else -> Color.LightGray
+                            colorVar == Color.Gray -> {
+                                when (arr[x - 1][y - 1]) {
+                                    1 -> Color(0xFF006605)
+                                    0 -> Color.Cyan
+                                    else -> Color.Gray
+                                }
+                            }
+                            else -> colorVar
                         }
                     },
                 contentAlignment = Alignment.Center,
             ) {
-                if (x == 0) Text(text = "${y + 1}")
-                else if (y == 0) Text(text = "${listOfChars[x]}")
+                if (x == 0) Text(text = "${y + 1}", fontFamily = comic.toFontFamily())
+                else if (y == 0) Text(text = "${listOfChars[x]}", fontFamily = comic.toFontFamily())
             }
         }
     }
 }
 
 @Composable
-fun gridCallOpponent(modifier: Modifier = Modifier) {
+fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
     val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
     LazyVerticalGrid(
         modifier = modifier,
@@ -111,50 +123,75 @@ fun gridCallOpponent(modifier: Modifier = Modifier) {
 //        , modifier = Modifier.defaultMinSize(800.dp,800.dp)
     )
     {
-        for (x in 0..10) {
-            for (y in 0..10) {
-                items(1) {
-                    var colorVar by remember { mutableStateOf(Color.Gray) } //When it's a hit
-                    Box(
-                        modifier = Modifier
-                            .defaultMinSize(10.dp, 10.dp)
-                            .padding(1.dp) // Reduce padding to make items smaller
-                            .aspectRatio(1f) // Adjust aspect ratio to make the items smaller
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(
-                                when {
-                                    x == 0 && y == 0 -> Color.Black // Paint the box in the position (0, 0) black
-                                    else -> colorVar
-                                }
-                            )
-                            .clickable {
-                                if (x == 0 || y == 0) {
-                                    return@clickable
-                                }
-                                colorVar = when (colorVar) {
-                                    Color.Gray -> Color(0xFF04008E)
+        items(121) {    //Enemy grid
+            var colorVar by remember { mutableStateOf(Color.Gray) } //When it's a hit
+            val x = it % 11
+            val y = (it - 1) / 11
+            Box(
+                modifier = Modifier
+                    .defaultMinSize(10.dp, 10.dp)
+                    .padding(1.dp) // Reduce padding to make items smaller
+                    .aspectRatio(1f) // Adjust aspect ratio to make the items smaller
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(
+                        when {
+                            it == 0 -> Color.Black // Paint the box in the position (0, 0) black
+                            else -> colorVar
+                        }
+                    )
+                    .clickable {
+                        if (x == 0 || y == 0) {
+                            return@clickable
+                        }
+                        colorVar = when {
+                            colorVar == Color.Gray -> {
+                                when (arrOpponent[x - 1][y - 1]) {
+                                    1 -> Color.Red
+                                    0 -> Color.Cyan
                                     else -> Color.Gray
                                 }
-                                println("Touched!!")
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (x == 0) Text(text = "${listOfChars[y]}")
-                        else if (y == 0) Text(text = "$x")
-                    }
-                }
+                            }
+                            else -> colorVar
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (x == 0) Text(text = "${y + 1}", fontFamily = comic.toFontFamily())
+                else if (y == 0) Text(text = "${listOfChars[x]}", fontFamily = comic.toFontFamily())
             }
         }
+
     }
 }
 
 fun createArray(): Array<IntArray> {
     val arr = Array(10) { IntArray(10) }
+    var zeros = 100
+    var ones = 0
+
+    // Create a list with all the positions posibles in the array (0 .. 99)
+    val positions = mutableListOf<Pair<Int, Int>>()
     for (y in arr.indices) {
         for (x in arr[y].indices) {
-            arr[y][x] = (0..1).random()
+            positions.add(Pair(y, x))
         }
     }
+
+    // Shuffle the list to obtain the random positions
+    positions.shuffle()
+
+    // Put the ones in the first 20 positions random
+    for (i in 0 until 20) {
+        val (y, x) = positions[i]
+        arr[y][x] = 1
+        ones++
+    }
+
+    // El resto de posiciones se queda en 0, así que no hace falta cambiarlas
+    zeros = 100 - ones
+
+    println("Fist call\n0 catches $zeros")
+    println("1 catches $ones")
     return arr
 }
 
