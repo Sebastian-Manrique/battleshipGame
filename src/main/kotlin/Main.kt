@@ -91,9 +91,6 @@ fun gridCall(arr: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
                         }
                     )
                     .clickable {
-                        if (x == 0 || y == 0) {
-                            return@clickable
-                        }
                         colorVar = when {
                             colorVar == Color.Gray -> {
                                 when (arr[x - 1][y - 1]) {
@@ -140,9 +137,7 @@ fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifi
                         }
                     )
                     .clickable {
-                        if (x == 0 || y == 0) {
-                            return@clickable
-                        }
+                        opponentMove()
                         colorVar = when {
                             colorVar == Color.Gray -> {
                                 when (arrOpponent[x - 1][y - 1]) {
@@ -154,22 +149,28 @@ fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifi
                             else -> colorVar
                         }
                     },
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.Center
             ) {
                 if (x == 0) Text(text = "${y + 1}", fontFamily = comic.toFontFamily())
                 else if (y == 0) Text(text = "${listOfChars[x]}", fontFamily = comic.toFontFamily())
             }
         }
-
     }
+}
+
+fun opponentMove() {
+    val rndX = (0..10).random() // generated random from 0 to 10 included
+    val rndY = (0..10).random() // generated random from 0 to 10 included
+    println("Shot to $rndX, $rndY")
+
 }
 
 fun createArray(): Array<IntArray> {
     val arr = Array(10) { IntArray(10) }
-    var zeros = 100
+    val zeros: Int
     var ones = 0
 
-    // Create a list with all the positions posibles in the array (0 .. 99)
+    // Create a list with all the positions posibles in the array (0  99)
     val positions = mutableListOf<Pair<Int, Int>>()
     for (y in arr.indices) {
         for (x in arr[y].indices) {
