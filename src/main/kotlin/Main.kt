@@ -51,7 +51,7 @@ fun App() {
                 }
                 Spacer(modifier = Modifier.size(100.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                    gridCallOpponent(arrOpponent, comic)
+                    gridCallOpponent(arr, arrOpponent, comic)
                     Text("Enemy field", color = Color.White, fontFamily = comic.toFontFamily(), fontSize = 40.sp)
                 }
             }
@@ -99,6 +99,7 @@ fun gridCall(arr: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
                                     else -> Color.Gray
                                 }
                             }
+
                             else -> colorVar
                         }
                     },
@@ -112,7 +113,7 @@ fun gridCall(arr: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
+fun gridCallOpponent(arrFriendly: Array<IntArray>, arrOpponent: Array<IntArray>, comic: Font, modifier: Modifier = Modifier) {
     val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
     LazyVerticalGrid(
         modifier = modifier,
@@ -137,7 +138,7 @@ fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifi
                         }
                     )
                     .clickable {
-                        opponentMove()
+                        opponentMove(arrFriendly)
                         colorVar = when {
                             colorVar == Color.Gray -> {
                                 when (arrOpponent[x - 1][y - 1]) {
@@ -146,6 +147,7 @@ fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifi
                                     else -> Color.Gray
                                 }
                             }
+
                             else -> colorVar
                         }
                     },
@@ -158,11 +160,27 @@ fun gridCallOpponent(arrOpponent: Array<IntArray>, comic: Font, modifier: Modifi
     }
 }
 
-fun opponentMove() {
-    val rndX = (0..10).random() // generated random from 0 to 10 included
-    val rndY = (0..10).random() // generated random from 0 to 10 included
+fun opponentMove(arrFriendly: Array<IntArray>) {
+    val rndX = (0..9).random() // generated random from 0 to 10 included
+    val rndY = (0..9).random() // generated random from 0 to 10 included
     println("Shot to $rndX, $rndY")
-
+    //Array (vacio)  val arrGenerated = Array(10) { IntArray(10) } Guardar el resultado
+    //foreach arrFriendly
+    /*
+    *   if arrGenerated[rndX] [rndY] == 1
+    *       Regenerar
+    *   else
+    *       arrGenerated[rndX] [rndY] = 1
+    *           if arrFriendly [rndX] [rndY] == 1
+    *               Tornar a Rojo
+    *           Else
+    *               Tornar a Azul
+    * */
+    for (arrays in arrFriendly) {
+        for (values in arrays) {
+            println("Things inside the array $values")
+        }
+    }
 }
 
 fun createArray(): Array<IntArray> {
@@ -198,6 +216,7 @@ fun createArray(): Array<IntArray> {
 
 fun main() = application {
     Window(
+        title = "BattleShipGame",
         onCloseRequest = ::exitApplication,
         state = rememberWindowState(size = DpSize(1200.dp, 650.dp))  // Specify  the inicial size of the window
     ) {
