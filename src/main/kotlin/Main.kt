@@ -26,7 +26,7 @@ import androidx.compose.ui.window.rememberWindowState
 
 var arr = mutableStateOf(createArray())
 var arrOpponent = mutableStateOf(createArray())
-var opponentShots = mutableStateOf(Array(10) { kotlin.IntArray(10) })
+var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 
 val comic = Font(
     resource = "fontC.ttf",
@@ -37,8 +37,6 @@ val comic = Font(
 @Composable
 @Preview
 fun App() {
-
-
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -47,14 +45,30 @@ fun App() {
                 .background(Color.Black) // background black
         ) {
             Row {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
                     gridCallOfFriendly(comic)
-                    Text("Your field", color = Color.White, fontFamily = comic.toFontFamily(), fontSize = 40.sp)
+                    Text(
+                        "Your field",
+                        color = Color.White,
+                        fontFamily = comic.toFontFamily(),
+                        fontSize = 40.sp
+                    )
                 }
                 Spacer(modifier = Modifier.size(100.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
                     gridCallOpponent(comic)
-                    Text("Enemy field", color = Color.White, fontFamily = comic.toFontFamily(), fontSize = 40.sp)
+                    Text(
+                        "Enemy field",
+                        color = Color.White,
+                        fontFamily = comic.toFontFamily(),
+                        fontSize = 40.sp
+                    )
                 }
             }
         }
@@ -64,6 +78,7 @@ fun App() {
 @Composable
 fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
     val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
+
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Fixed(11)
@@ -72,13 +87,12 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
             val x = it % 11 // Calcula `x` basado en el índice
             val y = it / 11 // Calcula `y` basado en el índice (no restes 1 aquí)
 
-            // Asegúrate de no acceder a índices fuera de los límites de los arrays
             val colorVar = when {
+                x > 0 && y > 0 && opponentShots.value[x - 1][y - 1] == 1 -> {
+                    Color.Red // Si hay un disparo en la posición (x, y), pinta rojo
+                }
                 x > 0 && y > 0 && arr.value[x - 1][y - 1] == 1 -> {
                     Color(0xFF006605) // Si arr[x][y] == 1, pinta verde
-                }
-                opponentShots.value.getOrNull(x)?.getOrNull(y) == 1 -> {
-                    Color.Red // Si hay un disparo en la posición (x, y), pinta rojo
                 }
                 else -> {
                     Color.LightGray // Usa el color por defecto
@@ -109,7 +123,6 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
     }
 }
 
-
 @Composable
 fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
     val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
@@ -118,7 +131,7 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
         modifier = modifier,
         columns = GridCells.Fixed(11)
     ) {
-        items(121) {    // Enemy grid
+        items(121) { it ->    // Enemy grid
             var colorVar by remember { mutableStateOf(Color.Gray) } // When it's a hit
             val x = it % 11
             val y = it / 11
@@ -140,18 +153,12 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
                             Modifier
                         } else Modifier
                             .clickable {
-                                opponentMove() // Ahora modificas el estado aquí
-                                colorVar = when {
-                                    colorVar == Color.Gray -> {
-                                        when (arrOpponent.value[x - 1][y - 1]) {
-                                            1 -> Color.Red
-                                            0 -> Color.Cyan
-                                            else -> Color.Gray
-                                        }
-                                    }
-
-                                    else -> colorVar
+                                colorVar = when (arrOpponent.value[x - 1][y - 1]) {
+                                    1 -> Color.Red
+                                    0 -> Color.Cyan
+                                    else -> Color.Gray
                                 }
+                                opponentMove() // Modifica estado
                             }
                     ),
                 contentAlignment = Alignment.Center
@@ -176,9 +183,19 @@ fun opponentMove() {
 
         // Si no ha disparado previamente en esa posición
         if (opponentShots.value[rndX][rndY] == 0) {
-            // Marca la posición como disparada
-            opponentShots.value[rndX][rndY] = 1
+            val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray() // <----- XDDDDDDDDDDDDDDDDDDDDDDDDDDD
+            /*
+            * El problema era que compose no detectaba que si habia modificado el array, por lo que no se actualizaba
+            *
+            *
+            * */
+
+            newShots[rndX][rndY] = 1
+
+            // Actualiza el estado con la nueva copia del array
+            opponentShots.value = newShots
             validShot = true
+
             println("Opponent shoots at position: ($rndX, $rndY)")
         }
     }
@@ -187,8 +204,6 @@ fun opponentMove() {
 
 fun createArray(): Array<IntArray> {
     val arr = Array(10) { IntArray(10) }
-    val zeros: Int
-    var ones = 0
 
     // Create a list with all the positions posibles in the array (0  99)
     val positions = mutableListOf<Pair<Int, Int>>()
@@ -205,14 +220,8 @@ fun createArray(): Array<IntArray> {
     for (i in 0 until 20) {
         val (y, x) = positions[i]
         arr[y][x] = 1
-        ones++
     }
 
-    // El resto de posiciones se queda en 0, así que no hace falta cambiarlas
-    zeros = 100 - ones
-
-    println("Fist call\n0 catches $zeros")
-    println("1 catches $ones")
     return arr
 }
 
@@ -220,7 +229,7 @@ fun main() = application {
     Window(
         title = "BattleShipGame",
         onCloseRequest = ::exitApplication,
-        state = rememberWindowState(size = DpSize(1200.dp, 650.dp))  // Specify the inicial size of the window
+        state = rememberWindowState(size = DpSize(1200.dp, 650.dp))  // Specify the initial size of the window
     ) {
         App()
     }
