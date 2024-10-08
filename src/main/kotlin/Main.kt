@@ -27,6 +27,7 @@ import androidx.compose.ui.window.rememberWindowState
 var arr = mutableStateOf(createArray())
 var arrOpponent = mutableStateOf(createArray())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
+val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
 
 val comic = Font(
     resource = "fontC.ttf",
@@ -77,7 +78,6 @@ fun App() {
 
 @Composable
 fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
-    val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
 
     LazyVerticalGrid(
         modifier = modifier,
@@ -89,11 +89,17 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
 
             val colorVar = when {
                 x > 0 && y > 0 && opponentShots.value[x - 1][y - 1] == 1 -> {
-                    Color.Red // Si hay un disparo en la posición (x, y), pinta rojo
+                    if (arr.value[x - 1][y - 1] == 1) {
+                        Color.Red // If there is a shot in the position (x,y) paint red (Ship)
+                    } else {
+                        Color.Cyan // If there is a shot in the position (x,y) paint cyan (Water)
+                    }
                 }
+
                 x > 0 && y > 0 && arr.value[x - 1][y - 1] == 1 -> {
                     Color(0xFF006605) // Si arr[x][y] == 1, pinta verde
                 }
+
                 else -> {
                     Color.LightGray // Usa el color por defecto
                 }
@@ -114,7 +120,7 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center,
             ) {
                 if (x == 0) {
-                    Text(text = "${y + 1}", fontFamily = comic.toFontFamily())
+                    Text(text = "$y", fontFamily = comic.toFontFamily())
                 } else if (y == 0) {
                     Text(text = "${listOfChars[x]}", fontFamily = comic.toFontFamily())
                 }
@@ -125,7 +131,7 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
 
 @Composable
 fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
-    val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
+
 
     LazyVerticalGrid(
         modifier = modifier,
@@ -158,20 +164,24 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
                                     0 -> Color.Cyan
                                     else -> Color.Gray
                                 }
-                                opponentMove() // Modifica estado
+                                println("Position shot : (${listOfChars[x]}, $y)")
+                                //Actual X and actual Y
+                                opponentMove(x, y) // Modify state
                             }
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                if (x == 0) Text(text = "${y + 1}", fontFamily = comic.toFontFamily())
+                if (x == 0) Text(text = "$y", fontFamily = comic.toFontFamily())
                 else if (y == 0) Text(text = "${listOfChars[x]}", fontFamily = comic.toFontFamily())
             }
         }
     }
 }
 
-fun opponentMove() {
-    println("Shooting!")
+fun opponentMove(actualX: Int, actualY: Int) {
+    val alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
+    println("Actual shot(start of opponentMove): $actualX, $actualY," +
+            "\nposition in the alreadyShot array= ${alreadyShot.value[actualX][actualY]}")
     var validShot = false
     var rndX: Int
     var rndY: Int
@@ -180,27 +190,28 @@ fun opponentMove() {
     while (!validShot) {
         rndX = (0..9).random()
         rndY = (0..9).random()
-
+        if (alreadyShot.value[actualX][actualY] == 1) {
+            println("Do nothing! This position was already shot.")
+            break  // Sale del bucle si ya se disparó en esta posición
+        } else
         // Si no ha disparado previamente en esa posición
-        if (opponentShots.value[rndX][rndY] == 0) {
-            val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray() // <----- XDDDDDDDDDDDDDDDDDDDDDDDDDDD
-            /*
-            * El problema era que compose no detectaba que si habia modificado el array, por lo que no se actualizaba
-            *
-            *
-            * */
+            if (opponentShots.value[rndX][rndY] == 0) {
+                val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray() // <----- XDDDDDDDDDDDDDDDDDDDDDDD
+                /*
+                * El problema era que compose no detectaba si había modificado el array, por lo que no se actualizaba
+                */
+                newShots[rndX][rndY] = 1
 
-            newShots[rndX][rndY] = 1
+                // Actualiza el estado con la nueva copia del array
+                opponentShots.value = newShots
+                validShot = true
 
-            // Actualiza el estado con la nueva copia del array
-            opponentShots.value = newShots
-            validShot = true
-
-            println("Opponent shoots at position: ($rndX, $rndY)")
-        }
+                println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
+                println("Actual shot(inside of the while):  (${listOfChars[actualX]}, $actualY)")
+                alreadyShot.value[actualX][actualY] = 1
+            }
     }
 }
-
 
 fun createArray(): Array<IntArray> {
     val arr = Array(10) { IntArray(10) }
