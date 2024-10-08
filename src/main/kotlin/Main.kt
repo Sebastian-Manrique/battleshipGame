@@ -27,6 +27,7 @@ import androidx.compose.ui.window.rememberWindowState
 var arr = mutableStateOf(createArray())
 var arrOpponent = mutableStateOf(createArray())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
+val alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
 
 val comic = Font(
@@ -165,8 +166,9 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
                                     else -> Color.Gray
                                 }
                                 println("Position shot : (${listOfChars[x]}, $y)")
+                                println("Real positon: (${x-1}, ${y-1})")
                                 //Actual X and actual Y
-                                opponentMove(x, y) // Modify state
+                                opponentMove(x-1, y-1) // Modify state
                             }
                     ),
                 contentAlignment = Alignment.Center
@@ -179,9 +181,17 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
 }
 
 fun opponentMove(actualX: Int, actualY: Int) {
-    val alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
-    println("Actual shot(start of opponentMove): $actualX, $actualY," +
-            "\nposition in the alreadyShot array= ${alreadyShot.value[actualX][actualY]}")
+    // Verifica que actualX y actualY estén dentro de los límites del array
+    if (actualX !in 0..9 || actualY !in 0..9) {
+        println("Invalid shot position! Coordinates must be between 0 and 9.")
+        return  // Sal de la función si las coordenadas no son válidas
+    }
+
+    println(
+        "Actual shot(start of opponentMove): $actualX, $actualY," +
+                "\nposition in the alreadyShot array= ${alreadyShot.value[actualX][actualY]}"
+    )
+
     var validShot = false
     var rndX: Int
     var rndY: Int
@@ -190,26 +200,27 @@ fun opponentMove(actualX: Int, actualY: Int) {
     while (!validShot) {
         rndX = (0..9).random()
         rndY = (0..9).random()
+
+        // Verifica si ya se ha disparado en las coordenadas actualX, actualY
         if (alreadyShot.value[actualX][actualY] == 1) {
             println("Do nothing! This position was already shot.")
             break  // Sale del bucle si ya se disparó en esta posición
-        } else
-        // Si no ha disparado previamente en esa posición
-            if (opponentShots.value[rndX][rndY] == 0) {
-                val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray() // <----- XDDDDDDDDDDDDDDDDDDDDDDD
-                /*
-                * El problema era que compose no detectaba si había modificado el array, por lo que no se actualizaba
-                */
-                newShots[rndX][rndY] = 1
+        } else if (opponentShots.value[rndX][rndY] == 0) {
+            // Si no ha disparado previamente en esa posición
+            val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray()
 
-                // Actualiza el estado con la nueva copia del array
-                opponentShots.value = newShots
-                validShot = true
+            newShots[rndX][rndY] = 1
 
-                println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
-                println("Actual shot(inside of the while):  (${listOfChars[actualX]}, $actualY)")
-                alreadyShot.value[actualX][actualY] = 1
-            }
+            // Actualiza el estado con la nueva copia del array
+            opponentShots.value = newShots
+            validShot = true
+
+            println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
+            println("Actual shot(inside of the while): (${listOfChars[actualX]}, $actualY)")
+
+            // Marca la posición actual como disparada en alreadyShot
+            alreadyShot.value[actualX][actualY] = 1
+        }
     }
 }
 
