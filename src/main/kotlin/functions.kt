@@ -1,9 +1,6 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -104,8 +101,9 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
                                     else -> Color.Gray
                                 }
                                 println("Position shot : (${listOfChars[x]}, $y)") //Actual is X-1 and actual Y-1
-
                                 opponentMove(x - 1, y - 1) // Modify state
+                                countArrayFriendly()
+                                countArrayEnemy()
                             }
                     ),
                 contentAlignment = Alignment.Center
@@ -174,34 +172,50 @@ fun opponentMove(actualX: Int, actualY: Int) {
             alreadyShot.value[actualX][actualY] = 1
         }
     }
-    countArrayEnemy()
 }
 
-fun countArrayEnemy() {
-    var hitCount = 0  // Iterate over the rows of the array (IntArray)
-    var boat = 0
+var win = mutableStateOf(false)
+
+fun countArrayFriendly() {
+    var friendlyBoatsHits = 0
+    var shotsCounter = 0
+
     opponentShots.value.forEachIndexed { rowIndex, row ->
         row.forEachIndexed { colIndex, shot ->
             if (shot == 1 && arrFriendly.value[rowIndex][colIndex] == 1) {
-                boat++
+                friendlyBoatsHits++
+                if (friendlyBoatsHits == 20) {
+                    win.value = false
+                }
             }
         }
     }
     opponentShots.value.forEach { row2 ->
         row2.forEach { cell ->        // Iterate over the elements of each row
             if (cell == 1) {
-                hitCount++
+                shotsCounter++
             }
         }
     }
-//    arrFriendly.value.forEach { row ->
-//        row.forEach { cell ->        // Iterate over the elements of each row
-//            if (cell == 1) {
-//
-//                boat++
-//            }
-//        }
-//    }
-    println("Number of shots: $hitCount")    // Print the result
-    println("Number of boats hit: $boat")
+    println("Number of shots: $shotsCounter")    // Print the result
+    println("Number of friendly boats hit: $friendlyBoatsHits")
+}
+
+fun countArrayEnemy() {
+    var enemyBoats = 0
+    // Iterate over the rows of the array (IntArray)
+    arrOpponent.value.forEachIndexed { rowIndex, row ->
+        row.forEachIndexed { colIndex, shot ->
+            if (shot == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
+                enemyBoats++
+                if (enemyBoats == 20) {
+                    win.value = true
+                }
+            }
+            if (shot == 1) {
+                println("----------------BOATS IN :${listOfChars[ rowIndex + 1]},${colIndex + 1}")
+            }
+        }
+    }
+    println("Number of enemy's boats hit: $enemyBoats\n------------------------------")
 }

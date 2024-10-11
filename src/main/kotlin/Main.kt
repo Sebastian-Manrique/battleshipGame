@@ -59,6 +59,15 @@ fun App() {
                     modifier = Modifier.weight(1f)
                 ) {
                     gridCallOpponent(comic)
+                    fun countArrayEnemy2() {
+                        arrOpponent.value.forEachIndexed { rowIndex, row ->
+                            row.forEachIndexed { colIndex, shot ->
+                                if (shot == 1) {
+                                    println("----------------BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
+                                }
+                            }
+                        }
+                    }
                     Text(
                         "Enemy field",
                         color = Color.White,
