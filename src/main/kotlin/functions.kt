@@ -100,7 +100,7 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
                                     0 -> Color.Cyan
                                     else -> Color.Gray
                                 }
-                                println("Position shot : (${listOfChars[x]}, $y)") //Actual is X-1 and actual Y-1
+                                // println("Position shot : (${listOfChars[x]}, $y)") //Actual is X-1 and actual Y-1
                                 opponentMove(x - 1, y - 1) // Modify state
                                 countArrayFriendly()
                                 countArrayEnemy()
@@ -113,6 +113,7 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
             }
         }
     }
+    //endGame()
 }
 
 fun createArray(): Array<IntArray> {
@@ -131,6 +132,28 @@ fun createArray(): Array<IntArray> {
 
     // Put the ones in the first 20 positions random
     for (i in 0 until 20) {
+        val (y, x) = positions[i]
+        arr[y][x] = 1
+    }
+    return arr
+}
+
+fun createArray2(): Array<IntArray> {
+    val arr = Array(10) { IntArray(10) }
+
+    // Create a list with all the positions posibles in the array (0  99)
+    val positions = mutableListOf<Pair<Int, Int>>()
+    for (y in arr.indices) {
+        for (x in arr[y].indices) {
+            positions.add(Pair(y, x))
+        }
+    }
+
+    // Shuffle the list to obtain the random positions
+    positions.shuffle()
+
+    // Put the ones in the first 20 positions random
+    for (i in 0 until 1) {
         val (y, x) = positions[i]
         arr[y][x] = 1
     }
@@ -167,7 +190,7 @@ fun opponentMove(actualX: Int, actualY: Int) {
             opponentShots.value = newShots
             validShot = true
 
-            println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
+            //  println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
             // Marca la posición actual como disparada en alreadyShot
             alreadyShot.value[actualX][actualY] = 1
         }
@@ -197,8 +220,8 @@ fun countArrayFriendly() {
             }
         }
     }
-    println("Number of shots: $shotsCounter")    // Print the result
-    println("Number of friendly boats hit: $friendlyBoatsHits")
+    //  println("Number of shots: $shotsCounter")    // Print the result
+    //println("Number of friendly boats hit: $friendlyBoatsHits")
 }
 
 fun countArrayEnemy() {
@@ -208,12 +231,13 @@ fun countArrayEnemy() {
         row.forEachIndexed { colIndex, shot ->
             if (shot == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
                 enemyBoats++
-                if (enemyBoats == 20) {
+                if (enemyBoats >= 1) {
                     win.value = true
+                    println("You win!")
                 }
             }
             if (shot == 1) {
-                println("----------------BOATS IN :${listOfChars[ rowIndex + 1]},${colIndex + 1}")
+                println("BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
             }
         }
     }

@@ -19,7 +19,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 var arrFriendly = mutableStateOf(createArray())
-var arrOpponent = mutableStateOf(createArray())
+//var arrOpponent = mutableStateOf(createArray())
+var arrOpponent = mutableStateOf(createArray2())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 val alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
@@ -31,7 +32,6 @@ val comic = Font(
 )
 
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
         Box(
@@ -59,15 +59,6 @@ fun App() {
                     modifier = Modifier.weight(1f)
                 ) {
                     gridCallOpponent(comic)
-                    fun countArrayEnemy2() {
-                        arrOpponent.value.forEachIndexed { rowIndex, row ->
-                            row.forEachIndexed { colIndex, shot ->
-                                if (shot == 1) {
-                                    println("----------------BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
-                                }
-                            }
-                        }
-                    }
                     Text(
                         "Enemy field",
                         color = Color.White,
