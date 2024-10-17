@@ -220,8 +220,20 @@ fun countArrayFriendly() {
             }
         }
     }
-    //  println("Number of shots: $shotsCounter")    // Print the result
-    //println("Number of friendly boats hit: $friendlyBoatsHits")
+    /*
+    * fun checkGameEnd() {
+    if (friendlyBoatsHits == 20 || enemyBoats == 0) {
+        // Aquí puedes usar un trigger para activar la interfaz composable
+        triggerEndGame()
+    }
+}
+
+@Composable
+fun triggerEndGame() {
+    endGame()  // Esto ya es @Composable
+}
+
+    * */
 }
 
 fun countArrayEnemy() {
@@ -234,7 +246,7 @@ fun countArrayEnemy() {
                 if (enemyBoats >= 1) {
                     win.value = true
                     println("You win!")
-                    //endGame()
+                    endGame()
                 }
             }
             if (shot == 1) {
