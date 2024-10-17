@@ -113,7 +113,6 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
             }
         }
     }
-    //endGame()
 }
 
 fun createArray(): Array<IntArray> {
@@ -209,6 +208,7 @@ fun countArrayFriendly() {
                 friendlyBoatsHits++
                 if (friendlyBoatsHits == 20) {
                     win.value = false
+                    //endGame()
                 }
             }
         }
@@ -234,6 +234,7 @@ fun countArrayEnemy() {
                 if (enemyBoats >= 1) {
                     win.value = true
                     println("You win!")
+                    //endGame()
                 }
             }
             if (shot == 1) {

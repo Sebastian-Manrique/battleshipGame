@@ -26,9 +26,13 @@ fun endGame() {
             .defaultMinSize(minHeight = 900.dp)
             .fillMaxSize() // Take all the space available
             .background(Color.Black) // background black
+            , contentAlignment = Alignment.Center
     ) {
         if (win.value){
-            Text("You win!")
+            Text(text = "You win!", fontFamily = comic.toFontFamily(), color = Color.Cyan, fontSize = 100.sp)
+        }
+        else{
+            Text(text = "You lose!", fontFamily = comic.toFontFamily(), color = Color.Cyan, fontSize = 100.sp)
         }
     }
 }
