@@ -206,10 +206,7 @@ fun countArrayFriendly() {
         row.forEachIndexed { colIndex, shot ->
             if (shot == 1 && arrFriendly.value[rowIndex][colIndex] == 1) {
                 friendlyBoatsHits++
-                if (friendlyBoatsHits == 20) {
-                    win.value = false
-                    //endGame()
-                }
+                checkGameEnd(friendlyBoatsHits, "Friendly")
             }
         }
     }
@@ -220,21 +217,26 @@ fun countArrayFriendly() {
             }
         }
     }
-    /*
-    * fun checkGameEnd() {
-    if (friendlyBoatsHits == 20 || enemyBoats == 0) {
-        // Aquí puedes usar un trigger para activar la interfaz composable
+}
+
+fun checkGameEnd(boats: Int, whereIsTheIntFrom: String) {
+    var boatsEnemy = 0
+    var boatsFriendly = 0
+    if (whereIsTheIntFrom == "Friendly") {
+        boatsFriendly = boats
+    } else {
+        boatsEnemy = boats
+    }
+    if (boats == 20 || boatsEnemy >= 1) {
         triggerEndGame()
     }
 }
 
 @Composable
 fun triggerEndGame() {
-    endGame()  // Esto ya es @Composable
+    endGame()
 }
 
-    * */
-}
 
 fun countArrayEnemy() {
     var enemyBoats = 0
@@ -243,11 +245,7 @@ fun countArrayEnemy() {
         row.forEachIndexed { colIndex, shot ->
             if (shot == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
                 enemyBoats++
-                if (enemyBoats >= 1) {
-                    win.value = true
-                    println("You win!")
-                    endGame()
-                }
+                checkGameEnd(enemyBoats, "enemyBoats")
             }
             if (shot == 1) {
                 println("BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
