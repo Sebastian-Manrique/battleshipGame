@@ -1,5 +1,5 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -18,8 +18,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
+// Variables globales y fuentes
 var arrFriendly = mutableStateOf(createArray())
-var arrOpponent = mutableStateOf(createArray())
+var arrOpponent = mutableStateOf(createArray2())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 val alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
@@ -30,15 +31,70 @@ val comic = Font(
     style = FontStyle.Normal
 )
 
+// Estados de las diferentes pantallas
+enum class Screen {
+    MainMenu,
+    Game,
+    EndGame
+}
+
 @Composable
-@Preview
 fun App() {
+    // Estado que guarda la pantalla actual
+    var currentScreen by remember { mutableStateOf(Screen.MainMenu) }
+
+    // Navegación basada en el estado de la pantalla
+    when (currentScreen) {
+        Screen.MainMenu -> MainMenuScreen(onStartGame = {
+            currentScreen = Screen.Game
+        })
+        Screen.Game -> GameScreen(onEndGame = {
+            currentScreen = Screen.EndGame
+        })
+        Screen.EndGame -> EndGameScreen(onRestart = {
+            currentScreen = Screen.MainMenu
+        })
+    }
+}
+
+// Pantalla del menú principal
+@Composable
+fun MainMenuScreen(onStartGame: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "BattleShip Game",
+                color = Color.White,
+                fontFamily = comic.toFontFamily(),
+                fontSize = 40.sp
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Start Game",
+                color = Color.Green,
+                fontSize = 30.sp,
+                modifier = Modifier.clickable { onStartGame() } // Cambiar a la pantalla del juego
+            )
+        }
+    }
+}
+
+// Pantalla del juego
+@Composable
+fun GameScreen(onEndGame: () -> Unit) {
     MaterialTheme {
         Box(
             modifier = Modifier
                 .defaultMinSize(minHeight = 900.dp)
-                .fillMaxSize() // Take all the space available
-                .background(Color.Black) // background black
+                .fillMaxSize()
+                .background(Color.Black)
         ) {
             Row {
                 Column(
@@ -59,15 +115,6 @@ fun App() {
                     modifier = Modifier.weight(1f)
                 ) {
                     gridCallOpponent(comic)
-                    fun countArrayEnemy2() {
-                        arrOpponent.value.forEachIndexed { rowIndex, row ->
-                            row.forEachIndexed { colIndex, shot ->
-                                if (shot == 1) {
-                                    println("----------------BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
-                                }
-                            }
-                        }
-                    }
                     Text(
                         "Enemy field",
                         color = Color.White,
@@ -76,6 +123,45 @@ fun App() {
                     )
                 }
             }
+            // Aquí se puede agregar un botón para simular el fin del juego
+            Text(
+                text = "End Game",
+                color = Color.Red,
+                fontSize = 30.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(20.dp)
+                    .clickable { onEndGame() } // Cambiar a la pantalla de fin de juego
+            )
+        }
+    }
+}
+
+// Pantalla de fin del juego
+@Composable
+fun EndGameScreen(onRestart: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Game Over",
+                color = Color.White,
+                fontFamily = comic.toFontFamily(),
+                fontSize = 40.sp
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Restart",
+                color = Color.Green,
+                fontSize = 30.sp,
+                modifier = Modifier.clickable { onRestart() } // Cambiar a la pantalla de menú principal
+            )
         }
     }
 }
@@ -84,7 +170,7 @@ fun main() = application {
     Window(
         title = "BattleShipGame",
         onCloseRequest = ::exitApplication,
-        state = rememberWindowState(size = DpSize(1200.dp, 650.dp))  // Specify the initial size of the window
+        state = rememberWindowState(size = DpSize(1200.dp, 650.dp))
     ) {
         App()
     }

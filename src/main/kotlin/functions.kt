@@ -137,6 +137,29 @@ fun createArray(): Array<IntArray> {
     return arr
 }
 
+fun createArray2(): Array<IntArray> {
+    val arr = Array(10) { IntArray(10) }
+
+    // Create a list with all the positions posibles in the array (0  99)
+    val positions = mutableListOf<Pair<Int, Int>>()
+    for (y in arr.indices) {
+        for (x in arr[y].indices) {
+            positions.add(Pair(y, x))
+        }
+    }
+
+    // Shuffle the list to obtain the random positions
+    positions.shuffle()
+
+    // Put the ones in the first 20 positions random
+    for (i in 0 until 1) {
+        val (y, x) = positions[i]
+        arr[y][x] = 1
+    }
+    return arr
+}
+
+
 fun opponentMove(actualX: Int, actualY: Int) {
     // Verifica que actualX y actualY estén dentro de los límites del array
     if (actualX !in 0..9 || actualY !in 0..9) {
@@ -175,6 +198,7 @@ fun opponentMove(actualX: Int, actualY: Int) {
 }
 
 var win = mutableStateOf(false)
+var gameFinished = mutableStateOf(false)
 
 fun countArrayFriendly() {
     var friendlyBoatsHits = 0
@@ -186,6 +210,7 @@ fun countArrayFriendly() {
                 friendlyBoatsHits++
                 if (friendlyBoatsHits == 20) {
                     win.value = false
+                    gameFinished.value = false
                 }
             }
         }
@@ -208,14 +233,27 @@ fun countArrayEnemy() {
         row.forEachIndexed { colIndex, shot ->
             if (shot == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
                 enemyBoats++
-                if (enemyBoats == 20) {
+                if (enemyBoats >= 20) {
                     win.value = true
+                    gameFinished.value = true
+                    println("You just win!")
                 }
             }
             if (shot == 1) {
-                println("----------------BOATS IN :${listOfChars[ rowIndex + 1]},${colIndex + 1}")
+                println("----------------BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
             }
         }
     }
     println("Number of enemy's boats hit: $enemyBoats\n------------------------------")
+}
+
+@Composable
+fun GameScreen() {
+    // La función observa `gameFinished` y cambia el contenido de la UI
+    if (gameFinished.value) {
+        Text("Ended!")
+    } else {
+        // Aquí va el contenido del juego mientras está en progreso
+        Text("Game is in progress")
+    }
 }
