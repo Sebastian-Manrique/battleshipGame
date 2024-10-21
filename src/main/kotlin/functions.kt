@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.dp
+import kotlin.system.exitProcess
 
 @Composable
 fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
@@ -100,10 +101,10 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
                                     0 -> Color.Cyan
                                     else -> Color.Gray
                                 }
-                                println("Position shot : (${listOfChars[x]}, $y)") //Actual is X-1 and actual Y-1
+                                // println("Position shot : (${listOfChars[x]}, $y)") //Actual is X-1 and actual Y-1
                                 opponentMove(x - 1, y - 1) // Modify state
                                 countArrayFriendly()
-                                countArrayEnemy()
+                                winCheck()
                             }
                     ),
                 contentAlignment = Alignment.Center
@@ -161,11 +162,6 @@ fun createArray2(): Array<IntArray> {
 
 
 fun opponentMove(actualX: Int, actualY: Int) {
-    // Verifica que actualX y actualY estén dentro de los límites del array
-    if (actualX !in 0..9 || actualY !in 0..9) {
-        println("Invalid shot position! Coordinates must be between 0 and 9.")
-        return  // Sal de la función si las coordenadas no son válidas
-    }
 
     var validShot = false
     var rndX: Int
@@ -190,7 +186,7 @@ fun opponentMove(actualX: Int, actualY: Int) {
             opponentShots.value = newShots
             validShot = true
 
-            println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
+            //println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
             // Marca la posición actual como disparada en alreadyShot
             alreadyShot.value[actualX][actualY] = 1
         }
@@ -222,38 +218,40 @@ fun countArrayFriendly() {
             }
         }
     }
-    println("Number of shots: $shotsCounter")    // Print the result
-    println("Number of friendly boats hit: $friendlyBoatsHits")
+    // println("Number of shots: $shotsCounter")    // Print the result
+    // println("Number of friendly boats hit: $friendlyBoatsHits")
 }
 
-fun countArrayEnemy() {
-    var enemyBoats = 0
-    // Iterate over the rows of the array (IntArray)
+fun winCheck(): Boolean {
+    var enemyBoatsHits = 0
+    val enemyBoatsTotal = 1  // Número total de barcos enemigos
+
+    // Recorre el array del oponente para contar los barcos hundidos
     arrOpponent.value.forEachIndexed { rowIndex, row ->
         row.forEachIndexed { colIndex, shot ->
-            if (shot == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
-                enemyBoats++
-                if (enemyBoats >= 20) {
-                    win.value = true
-                    gameFinished.value = true
-                    println("You just win!")
-                }
-            }
-            if (shot == 1) {
-                println("----------------BOATS IN :${listOfChars[rowIndex + 1]},${colIndex + 1}")
+            if (arrOpponent.value[rowIndex][colIndex] == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
+                // Si hay un barco en esa posición y ya se ha disparado allí
+                enemyBoatsHits++
             }
         }
     }
-    println("Number of enemy's boats hit: $enemyBoats\n------------------------------")
+
+    // Verifica si se han destruido todos los barcos enemigos
+    if (enemyBoatsHits == enemyBoatsTotal) {
+        isWin.value = true  // El jugador ha ganado
+        gameFinished.value = true
+        println("You win!")
+        return true
+    }
+
+    return false
 }
 
-@Composable
-fun GameScreen() {
-    // La función observa `gameFinished` y cambia el contenido de la UI
-    if (gameFinished.value) {
-        Text("Ended!")
-    } else {
-        // Aquí va el contenido del juego mientras está en progreso
-        Text("Game is in progress")
-    }
+fun resetAllFun() {
+    arrFriendly.value = createArray()
+    arrOpponent.value = createArray2()
+    opponentShots.value = Array(10) { IntArray(10) }
+    alreadyShot.value = Array(10) { IntArray(10) }
+    isWin.value = false
+    gameFinished.value = false
 }

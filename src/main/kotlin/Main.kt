@@ -1,3 +1,4 @@
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,12 +19,13 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
-// Variables globales y fuentes
+// Variables globales y fuentes (Encapsular mejor en un estado)
 var arrFriendly = mutableStateOf(createArray())
 var arrOpponent = mutableStateOf(createArray2())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
-val alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
+var alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
+val isWin = mutableStateOf(false)
 
 val comic = Font(
     resource = "fontC.ttf",
@@ -31,7 +33,6 @@ val comic = Font(
     style = FontStyle.Normal
 )
 
-// Estados de las diferentes pantallas
 enum class Screen {
     MainMenu,
     Game,
@@ -44,20 +45,24 @@ fun App() {
     var currentScreen by remember { mutableStateOf(Screen.MainMenu) }
 
     // Navegación basada en el estado de la pantalla
-    when (currentScreen) {
-        Screen.MainMenu -> MainMenuScreen(onStartGame = {
-            currentScreen = Screen.Game
-        })
-        Screen.Game -> GameScreen(onEndGame = {
-            currentScreen = Screen.EndGame
-        })
-        Screen.EndGame -> EndGameScreen(onRestart = {
-            currentScreen = Screen.MainMenu
-        })
+    Crossfade(targetState = currentScreen) { screen ->
+        when (screen) {
+            Screen.MainMenu -> MainMenuScreen(onStartGame = {
+                currentScreen = Screen.Game
+            })
+
+            Screen.Game -> GameScreen(onEndGame = {
+                currentScreen = Screen.EndGame
+            })
+
+            Screen.EndGame -> EndGameScreen(onRestart = {
+                currentScreen = Screen.MainMenu
+                resetAllFun()
+            })
+        }
     }
 }
 
-// Pantalla del menú principal
 @Composable
 fun MainMenuScreen(onStartGame: () -> Unit) {
     Box(
@@ -80,15 +85,17 @@ fun MainMenuScreen(onStartGame: () -> Unit) {
                 text = "Start Game",
                 color = Color.Green,
                 fontSize = 30.sp,
-                modifier = Modifier.clickable { onStartGame() } // Cambiar a la pantalla del juego
+                modifier = Modifier.clickable { onStartGame() }
             )
         }
     }
 }
 
-// Pantalla del juego
 @Composable
 fun GameScreen(onEndGame: () -> Unit) {
+//    if(isWin.value){
+//       isWin.value = false
+//    }
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -123,21 +130,17 @@ fun GameScreen(onEndGame: () -> Unit) {
                     )
                 }
             }
-            // Aquí se puede agregar un botón para simular el fin del juego
-            Text(
-                text = "End Game",
-                color = Color.Red,
-                fontSize = 30.sp,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(20.dp)
-                    .clickable { onEndGame() } // Cambiar a la pantalla de fin de juego
-            )
+
+            // Usar LaunchedEffect para detectar cambios en el estado del juego
+            LaunchedEffect(isWin.value) {
+                if (isWin.value) {
+                    onEndGame()  // Llama a la función que maneja el fin del juego
+                }
+            }
         }
     }
 }
 
-// Pantalla de fin del juego
 @Composable
 fun EndGameScreen(onRestart: () -> Unit) {
     Box(
@@ -150,7 +153,7 @@ fun EndGameScreen(onRestart: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "Game Over",
+                if (isWin.value) "You win!" else "You lose!",
                 color = Color.White,
                 fontFamily = comic.toFontFamily(),
                 fontSize = 40.sp
@@ -160,11 +163,15 @@ fun EndGameScreen(onRestart: () -> Unit) {
                 text = "Restart",
                 color = Color.Green,
                 fontSize = 30.sp,
-                modifier = Modifier.clickable { onRestart() } // Cambiar a la pantalla de menú principal
+                modifier = Modifier.clickable {
+                    resetAllFun()
+                    onRestart()
+                }
             )
         }
     }
 }
+
 
 fun main() = application {
     Window(
