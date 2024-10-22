@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.dp
-import kotlin.system.exitProcess
 
 @Composable
 fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
@@ -232,6 +231,9 @@ fun winCheck(): Boolean {
             if (arrOpponent.value[rowIndex][colIndex] == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
                 // Si hay un barco en esa posición y ya se ha disparado allí
                 enemyBoatsHits++
+            }
+            if (arrOpponent.value[rowIndex][colIndex] == 1) {
+                println("Enemy's boats in : ${listOfChars[rowIndex + 1]} , ${colIndex+1}")
             }
         }
     }

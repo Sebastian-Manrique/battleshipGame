@@ -57,7 +57,6 @@ fun App() {
 
             Screen.EndGame -> EndGameScreen(onRestart = {
                 currentScreen = Screen.MainMenu
-                resetAllFun()
             })
         }
     }
@@ -85,7 +84,10 @@ fun MainMenuScreen(onStartGame: () -> Unit) {
                 text = "Start Game",
                 color = Color.Green,
                 fontSize = 30.sp,
-                modifier = Modifier.clickable { onStartGame() }
+                modifier = Modifier.clickable {
+                    onStartGame()
+                    resetAllFun()
+                }
             )
         }
     }
@@ -93,9 +95,6 @@ fun MainMenuScreen(onStartGame: () -> Unit) {
 
 @Composable
 fun GameScreen(onEndGame: () -> Unit) {
-//    if(isWin.value){
-//       isWin.value = false
-//    }
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -164,7 +163,6 @@ fun EndGameScreen(onRestart: () -> Unit) {
                 color = Color.Green,
                 fontSize = 30.sp,
                 modifier = Modifier.clickable {
-                    resetAllFun()
                     onRestart()
                 }
             )
