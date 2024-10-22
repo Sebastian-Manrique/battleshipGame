@@ -195,7 +195,7 @@ fun opponentMove(actualX: Int, actualY: Int) {
 var win = mutableStateOf(false)
 var gameFinished = mutableStateOf(false)
 
-fun countArrayFriendly() {
+fun countArrayFriendly(): Boolean {
     var friendlyBoatsHits = 0
     var shotsCounter = 0
 
@@ -203,9 +203,11 @@ fun countArrayFriendly() {
         row.forEachIndexed { colIndex, shot ->
             if (shot == 1 && arrFriendly.value[rowIndex][colIndex] == 1) {
                 friendlyBoatsHits++
-                if (friendlyBoatsHits == 20) {
+                if (friendlyBoatsHits >= 1) {
                     win.value = false
-                    gameFinished.value = false
+                    gameFinished.value = true
+                    println("You lose!")
+                    return true
                 }
             }
         }
@@ -219,6 +221,7 @@ fun countArrayFriendly() {
     }
     // println("Number of shots: $shotsCounter")    // Print the result
     // println("Number of friendly boats hit: $friendlyBoatsHits")
+    return false
 }
 
 fun winCheck(): Boolean {
@@ -250,7 +253,7 @@ fun winCheck(): Boolean {
 }
 
 fun resetAllFun() {
-    arrFriendly.value = createArray()
+    arrFriendly.value = createArray2()
     arrOpponent.value = createArray2()
     opponentShots.value = Array(10) { IntArray(10) }
     alreadyShot.value = Array(10) { IntArray(10) }

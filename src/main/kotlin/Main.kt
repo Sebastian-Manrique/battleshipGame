@@ -20,7 +20,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 // Variables globales y fuentes (Encapsular mejor en un estado)
-var arrFriendly = mutableStateOf(createArray())
+var arrFriendly = mutableStateOf(createArray2())
 var arrOpponent = mutableStateOf(createArray2())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 var alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
