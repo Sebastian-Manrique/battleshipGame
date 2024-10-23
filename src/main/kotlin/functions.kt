@@ -129,36 +129,13 @@ fun createArray(): Array<IntArray> {
     // Shuffle the list to obtain the random positions
     positions.shuffle()
 
-    // Put the ones in the first 20 positions random
-    for (i in 0 until 20) {
+    // Put the ones in the first 17 positions random
+    for (i in 0 until 17) {
         val (y, x) = positions[i]
         arr[y][x] = 1
     }
     return arr
 }
-
-fun createArray2(): Array<IntArray> {
-    val arr = Array(10) { IntArray(10) }
-
-    // Create a list with all the positions posibles in the array (0  99)
-    val positions = mutableListOf<Pair<Int, Int>>()
-    for (y in arr.indices) {
-        for (x in arr[y].indices) {
-            positions.add(Pair(y, x))
-        }
-    }
-
-    // Shuffle the list to obtain the random positions
-    positions.shuffle()
-
-    // Put the ones in the first 20 positions random
-    for (i in 0 until 1) {
-        val (y, x) = positions[i]
-        arr[y][x] = 1
-    }
-    return arr
-}
-
 
 fun opponentMove(actualX: Int, actualY: Int) {
 
@@ -179,6 +156,14 @@ fun opponentMove(actualX: Int, actualY: Int) {
             // Si no ha disparado previamente en esa posición
             val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray()
 
+//            opponentShots.value.forEachIndexed { rowIndex, row ->
+//                row.forEachIndexed { colIndex, _ ->
+//                    if (arrFriendly.value[rowIndex][colIndex] == 1) {
+//                        newShots[rowIndex][colIndex] = 1
+//                    }
+//                }
+//            }
+
             newShots[rndX][rndY] = 1
 
             // Actualiza el estado con la nueva copia del array
@@ -192,26 +177,9 @@ fun opponentMove(actualX: Int, actualY: Int) {
     }
 }
 
-var win = mutableStateOf(false)
-var gameFinished = mutableStateOf(false)
-
 fun countArrayFriendly(): Boolean {
-    var friendlyBoatsHits = 0
     var shotsCounter = 0
-
-    opponentShots.value.forEachIndexed { rowIndex, row ->
-        row.forEachIndexed { colIndex, shot ->
-            if (shot == 1 && arrFriendly.value[rowIndex][colIndex] == 1) {
-                friendlyBoatsHits++
-                if (friendlyBoatsHits >= 1) {
-                    win.value = false
-                    gameFinished.value = true
-                    println("You lose!")
-                    return true
-                }
-            }
-        }
-    }
+    var friendlyShipsHits = 0
     opponentShots.value.forEach { row2 ->
         row2.forEach { cell ->        // Iterate over the elements of each row
             if (cell == 1) {
@@ -219,14 +187,34 @@ fun countArrayFriendly(): Boolean {
             }
         }
     }
-    // println("Number of shots: $shotsCounter")    // Print the result
-    // println("Number of friendly boats hit: $friendlyBoatsHits")
+
+
+    val friendlyShipsTotal = 17  // Número total de barcos enemigos
+
+    // Recorre el array del oponente para contar los barcos hundidos
+    arrFriendly.value.forEachIndexed { rowIndex, row ->
+        row.forEachIndexed { colIndex, shot ->
+            if (arrFriendly.value[rowIndex][colIndex] == 1 && opponentShots.value[rowIndex][colIndex] == 1) {
+                // Si hay un barco en esa posición y ya se ha disparado allí
+                friendlyShipsHits++
+            }
+        }
+    }
+    println("Number of friendly boats hit: $friendlyShipsHits")
+    println("Number of shots: $shotsCounter")    // Print the result
+    // Verifica si se han destruido todos los barcos enemigos
+    if (friendlyShipsHits == friendlyShipsTotal) {
+        isWin.value = false  // El jugador ha ganado
+        isLose.value = true
+        println("You lose!")
+        return true
+    }
     return false
 }
 
 fun winCheck(): Boolean {
     var enemyBoatsHits = 0
-    val enemyBoatsTotal = 1  // Número total de barcos enemigos
+    val enemyBoatsTotal = 17  // Número total de barcos enemigos
 
     // Recorre el array del oponente para contar los barcos hundidos
     arrOpponent.value.forEachIndexed { rowIndex, row ->
@@ -235,8 +223,10 @@ fun winCheck(): Boolean {
                 // Si hay un barco en esa posición y ya se ha disparado allí
                 enemyBoatsHits++
             }
-            if (arrOpponent.value[rowIndex][colIndex] == 1) {
-                println("Enemy's boats in : ${listOfChars[rowIndex + 1]} , ${colIndex+1}")
+            if (arrOpponent.value[rowIndex][colIndex] == 1 && alreadyShot.value[rowIndex][colIndex] == 1) {
+// pass
+            } else if (arrOpponent.value[rowIndex][colIndex] == 1) {
+                println(" Enemy's boats in : ${listOfChars[rowIndex + 1]} , ${colIndex + 1}")
             }
         }
     }
@@ -244,7 +234,6 @@ fun winCheck(): Boolean {
     // Verifica si se han destruido todos los barcos enemigos
     if (enemyBoatsHits == enemyBoatsTotal) {
         isWin.value = true  // El jugador ha ganado
-        gameFinished.value = true
         println("You win!")
         return true
     }
@@ -253,10 +242,10 @@ fun winCheck(): Boolean {
 }
 
 fun resetAllFun() {
-    arrFriendly.value = createArray2()
-    arrOpponent.value = createArray2()
+    arrFriendly.value = createArray()
+    arrOpponent.value = createArray()
     opponentShots.value = Array(10) { IntArray(10) }
     alreadyShot.value = Array(10) { IntArray(10) }
     isWin.value = false
-    gameFinished.value = false
+    isLose.value = false
 }

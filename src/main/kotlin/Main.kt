@@ -20,13 +20,13 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 // Variables globales y fuentes (Encapsular mejor en un estado)
-var arrFriendly = mutableStateOf(createArray2())
-var arrOpponent = mutableStateOf(createArray2())
+var arrFriendly = mutableStateOf(createArray())
+var arrOpponent = mutableStateOf(createArray())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 var alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
 val isWin = mutableStateOf(false)
-
+val isLose = mutableStateOf(false)
 val comic = Font(
     resource = "fontC.ttf",
     weight = FontWeight.Bold,
@@ -133,6 +133,11 @@ fun GameScreen(onEndGame: () -> Unit) {
             // Usar LaunchedEffect para detectar cambios en el estado del juego
             LaunchedEffect(isWin.value) {
                 if (isWin.value) {
+                    onEndGame()  // Llama a la función que maneja el fin del juego
+                }
+            }
+            LaunchedEffect(isLose.value) {
+                if (isLose.value) {
                     onEndGame()  // Llama a la función que maneja el fin del juego
                 }
             }
