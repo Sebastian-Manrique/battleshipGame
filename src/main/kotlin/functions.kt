@@ -1,3 +1,4 @@
+// Autor: Sebastian-Manrique
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,8 +23,8 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
         columns = GridCells.Fixed(11)
     ) {
         items(121) {  // Friendly grid
-            val x = it % 11 // Calcula `x` basado en el índice
-            val y = it / 11 // Calcula `y` basado en el índice (no restes 1 aquí)
+            val x = it % 11 // Calculate `x` based on the index
+            val y = it / 11 // Calculate `y` based on index (subtract later in each case)
 
             val colorVar = when {
                 x > 0 && y > 0 && opponentShots.value[x - 1][y - 1] == 1 -> {
@@ -35,11 +36,11 @@ fun gridCallOfFriendly(comic: Font, modifier: Modifier = Modifier) {
                 }
 
                 x > 0 && y > 0 && arrFriendly.value[x - 1][y - 1] == 1 -> {
-                    Color(0xFF006605) // Si arr[x][y] == 1, pinta verde
+                    Color(0xFF006605) // If arr[x][y] == 1, it paints green
                 }
 
                 else -> {
-                    Color.LightGray // Usa el color por defecto
+                    Color.LightGray // Default colour is grey
                 }
             }
 
@@ -143,35 +144,26 @@ fun opponentMove(actualX: Int, actualY: Int) {
     var rndX: Int
     var rndY: Int
 
-    // Repite hasta que encuentres una posición válida
+    // Repeat until a valid position is found
     while (!validShot) {
         rndX = (0..9).random()
         rndY = (0..9).random()
 
-        // Verifica si ya se ha disparado en las coordenadas actualX, actualY
+        // Checks if it has already been triggered at the currentX, currentY co-ordinates
         if (alreadyShot.value[actualX][actualY] == 1) {
             println("Do nothing! This position was already shot.")
-            break  // Sale del bucle si ya se disparó en esta posición
+            break  // exits the loop if it has already been triggered in this position.
         } else if (opponentShots.value[rndX][rndY] == 0) {
-            // Si no ha disparado previamente en esa posición
+            // If you have not previously fired in that position
             val newShots = opponentShots.value.map { it.copyOf() }.toTypedArray()
-
-//            opponentShots.value.forEachIndexed { rowIndex, row ->
-//                row.forEachIndexed { colIndex, _ ->
-//                    if (arrFriendly.value[rowIndex][colIndex] == 1) {
-//                        newShots[rowIndex][colIndex] = 1
-//                    }
-//                }
-//            }
-
             newShots[rndX][rndY] = 1
 
-            // Actualiza el estado con la nueva copia del array
+            // Update the state with the new copy of the array.
             opponentShots.value = newShots
             validShot = true
 
             //println("Opponent shoots at position: (${listOfChars[rndX + 1]}, ${rndY + 1})")
-            // Marca la posición actual como disparada en alreadyShot
+            // Save the current position as fired in alreadyShot.
             alreadyShot.value[actualX][actualY] = 1
         }
     }
@@ -189,13 +181,13 @@ fun countArrayFriendly(): Boolean {
     }
 
 
-    val friendlyShipsTotal = 17  // Número total de barcos enemigos
+    val friendlyShipsTotal = 17  // Total numbers of friendly ships
 
     // Recorre el array del oponente para contar los barcos hundidos
     arrFriendly.value.forEachIndexed { rowIndex, row ->
         row.forEachIndexed { colIndex, shot ->
             if (arrFriendly.value[rowIndex][colIndex] == 1 && opponentShots.value[rowIndex][colIndex] == 1) {
-                // Si hay un barco en esa posición y ya se ha disparado allí
+                // If there is a ship in that position and it has already been fired upon
                 friendlyShipsHits++
             }
         }
