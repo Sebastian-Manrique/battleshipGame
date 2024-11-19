@@ -23,7 +23,7 @@ import kotlin.system.exitProcess
 
 // Global variables and the Comic Sans, encapsulated in a state
 var arrFriendly = mutableStateOf(createArray())
-var arrOpponent = mutableStateOf(createArray())
+var arrOpponent = mutableStateOf(createShips())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 var alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
@@ -133,9 +133,9 @@ fun GameScreen(onEndGame: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
-                    gridCallOpponent(comic)
+                    puttingTheShips(comic)
                     Text(
-                        "Enemy field",
+                        "Yours ships",
                         color = Color.White,
                         fontFamily = comic.toFontFamily(),
                         fontSize = 40.sp

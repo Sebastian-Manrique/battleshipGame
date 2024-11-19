@@ -116,6 +116,45 @@ fun gridCallOpponent(comic: Font, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun puttingTheShips(comic: Font, modifier: Modifier = Modifier) {
+    LazyVerticalGrid(
+        modifier = modifier,
+        columns = GridCells.Fixed(10)
+    ) {
+        items(20) {     // Enemy grid
+            var colorVar by remember { mutableStateOf(Color.Gray) } // When it's a hit
+            val x = it % 2
+            val y = it / 2
+
+            Box(
+                modifier = Modifier
+                    .defaultMinSize(10.dp, 10.dp)
+                    .padding(1.dp) // Reduce padding to make items smaller
+                    .aspectRatio(1f) // Adjust aspect ratio to make the items smaller
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(
+                        when {
+                            x % 2 == 1 -> Color.Green // Paint the box in the position (0, 0) black
+                            else -> colorVar
+                        }
+                    )
+                    .then(Modifier
+                        .clickable {
+                            colorVar = when (x - 1) {
+                                0 -> Color.Green
+                                else -> Color.Gray
+                            }
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                //pass
+            }
+        }
+    }
+}
+
 fun createArray(): Array<IntArray> {
     val arr = Array(10) { IntArray(10) }
 
@@ -134,6 +173,17 @@ fun createArray(): Array<IntArray> {
     for (i in 0 until 17) {
         val (y, x) = positions[i]
         arr[y][x] = 1
+    }
+    return arr
+}
+
+fun createShips(): Array<IntArray> {
+    val arr = Array(2) { IntArray(10) }
+    for (x in arr.indices) {
+        for (y in arr[x].indices) {
+            print("[ ${arr[x][y]} ]")
+        }
+        println()
     }
     return arr
 }
