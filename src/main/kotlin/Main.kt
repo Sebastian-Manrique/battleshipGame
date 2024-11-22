@@ -42,7 +42,7 @@ enum class Screen {
 }
 
 @Composable
-fun App() {
+fun app() {
     // Current screen state
     var currentScreen by remember { mutableStateOf(Screen.MainMenu) }
 
@@ -53,11 +53,11 @@ fun App() {
                 currentScreen = Screen.Game
             })
 
-            Screen.Game -> GameScreen(onEndGame = {
+            Screen.Game -> gameScreen(onEndGame = {
                 currentScreen = Screen.EndGame
             })
 
-            Screen.EndGame -> EndGameScreen(onRestart = {
+            Screen.EndGame -> endGameScreen(onRestart = {
                 currentScreen = Screen.MainMenu
             })
         }
@@ -107,7 +107,7 @@ fun MainMenuScreen(onStartGame: () -> Unit) {
 }
 
 @Composable
-fun GameScreen(onEndGame: () -> Unit) {
+fun gameScreen(onEndGame: () -> Unit) {
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -159,7 +159,7 @@ fun GameScreen(onEndGame: () -> Unit) {
 }
 
 @Composable
-fun EndGameScreen(onRestart: () -> Unit) {
+fun endGameScreen(onRestart: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -195,6 +195,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         state = rememberWindowState(size = DpSize(1200.dp, 650.dp))
     ) {
-        App()
+        app()
     }
 }
