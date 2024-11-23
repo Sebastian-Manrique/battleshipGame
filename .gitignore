@@ -1,7 +1,8 @@
 
 # Created by https://www.gitignore.io/api/java,linux,macos,windows,android,intellij,androidstudio
 # Edit at https://www.gitignore.io/?templates=java,linux,macos,windows,android,intellij,androidstudio
-
+### Files from plugins I think###
+META-INF/
 ### Android ###
 # Built application files
 *.apk
@@ -41,6 +42,7 @@ captures/
 # IntelliJ
 *.iml
 .idea/workspace.xml
+.idea/discord.xml
 .idea/tasks.xml
 .idea/gradle.xml
 .idea/assetWizardSettings.xml
