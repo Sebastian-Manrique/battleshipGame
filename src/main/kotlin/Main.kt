@@ -1,3 +1,4 @@
+// Autor: Sebastian-Manrique ⚓
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,10 +19,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlin.system.exitProcess
 
-// Variables globales y fuentes (Encapsular mejor en un estado)
+// Global variables and the Comic Sans, encapsulated in a state
 var arrFriendly = mutableStateOf(createArray())
-var arrOpponent = mutableStateOf(createArray())
+var arrOpponent = mutableStateOf(createShips())
 var opponentShots = mutableStateOf(Array(10) { IntArray(10) })
 var alreadyShot = mutableStateOf(Array(10) { IntArray(10) })
 val listOfChars = listOf(' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J')
@@ -40,22 +42,22 @@ enum class Screen {
 }
 
 @Composable
-fun App() {
-    // Estado que guarda la pantalla actual
+fun app() {
+    // Current screen state
     var currentScreen by remember { mutableStateOf(Screen.MainMenu) }
 
-    // Navegación basada en el estado de la pantalla
+    // Navigation based on screen state
     Crossfade(targetState = currentScreen) { screen ->
         when (screen) {
             Screen.MainMenu -> MainMenuScreen(onStartGame = {
                 currentScreen = Screen.Game
             })
 
-            Screen.Game -> GameScreen(onEndGame = {
+            Screen.Game -> gameScreen(onEndGame = {
                 currentScreen = Screen.EndGame
             })
 
-            Screen.EndGame -> EndGameScreen(onRestart = {
+            Screen.EndGame -> endGameScreen(onRestart = {
                 currentScreen = Screen.MainMenu
             })
         }
@@ -68,20 +70,20 @@ fun MainMenuScreen(onStartGame: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "BattleShip Game",
+                "BattleShip game",
                 color = Color.White,
                 fontFamily = comic.toFontFamily(),
                 fontSize = 40.sp
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Start Game",
+                text = "Start game",
                 color = Color.Green,
                 fontSize = 30.sp,
                 modifier = Modifier.clickable {
@@ -90,11 +92,22 @@ fun MainMenuScreen(onStartGame: () -> Unit) {
                 }
             )
         }
+        Text(
+            text = "Exit game",
+            color = Color.Red,
+            fontSize = 30.sp,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+                .clickable {
+                    exitProcess(0)
+                }
+        )
     }
 }
 
 @Composable
-fun GameScreen(onEndGame: () -> Unit) {
+fun gameScreen(onEndGame: () -> Unit) {
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -120,9 +133,9 @@ fun GameScreen(onEndGame: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
-                    gridCallOpponent(comic)
+                    puttingTheShips(comic)
                     Text(
-                        "Enemy field",
+                        "Yours ships",
                         color = Color.White,
                         fontFamily = comic.toFontFamily(),
                         fontSize = 40.sp
@@ -130,15 +143,15 @@ fun GameScreen(onEndGame: () -> Unit) {
                 }
             }
 
-            // Usar LaunchedEffect para detectar cambios en el estado del juego
+            // Using LaunchedEffect to detect changes in game state
             LaunchedEffect(isWin.value) {
                 if (isWin.value) {
-                    onEndGame()  // Llama a la función que maneja el fin del juego
+                    onEndGame()  // Call the function that handles the end of the game
                 }
             }
             LaunchedEffect(isLose.value) {
                 if (isLose.value) {
-                    onEndGame()  // Llama a la función que maneja el fin del juego
+                    onEndGame()  // Same as the top
                 }
             }
         }
@@ -146,7 +159,7 @@ fun GameScreen(onEndGame: () -> Unit) {
 }
 
 @Composable
-fun EndGameScreen(onRestart: () -> Unit) {
+fun endGameScreen(onRestart: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -182,6 +195,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         state = rememberWindowState(size = DpSize(1200.dp, 650.dp))
     ) {
-        App()
+        app()
     }
 }
