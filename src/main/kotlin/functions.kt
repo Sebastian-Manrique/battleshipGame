@@ -135,16 +135,9 @@ fun puttingTheShips(comic: Font, modifier: Modifier = Modifier) {
                     .clip(RoundedCornerShape(5.dp))
                     .background(
                         when {
-                            x % 2 == 1 -> Color.Green // Paint the box in the position (0, 0) black
+                            x == 0 && y == 0 -> Color.Green
+                            x == 0 && y == 1 -> Color.Green
                             else -> colorVar
-                        }
-                    )
-                    .then(Modifier
-                        .clickable {
-                            colorVar = when (x - 1) {
-                                0 -> Color.Green
-                                else -> Color.Gray
-                            }
                         }
                     ),
                 contentAlignment = Alignment.Center
